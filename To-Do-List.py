@@ -27,6 +27,23 @@ def main():
             display_tasks(tasks)
 
         elif choice == "3":
+            display_tasks(tasks)
+            try:
+                task_index = int(input("Geben Sie die Nummer der Aufgabe ein, die Sie entfernen möchten: ")) - 1
+                if 0 <= task_index < len(tasks):
+                    removed_task = tasks.pop(task_index)
+                    print(f"Aufgabe '{removed_task}' entfernt.")
+                else:
+                    print("Ungültige Nummer.")
+            except ValueError:
+                print("Bitte geben Sie eine gültige Zahl ein.")
+
+        elif choice == '4':
+            print("Programm beendet.")
+            break
+
+        else:
+            print("Ungültige Eingabe. Bitte wählen Sie eine Option zwischen 1 und 4.")
 
 if __name__ == "__main__":
     main()
