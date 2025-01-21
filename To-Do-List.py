@@ -17,5 +17,16 @@ def main():
         print("4. Programm beenden")
 
         choice = input("Bitte eine Option auswählen (1-4): ")
+
+        if choice == "1":
+            task = input("Neue Aufgabe eingeben: ")
+            tasks.append(task)
+            print(f"Aufgabe '{task}' hinzugefügt.")
+
+        elif choice == "2":
+            display_tasks(tasks)
+
+        elif choice == "3":
+
 if __name__ == "__main__":
     main()
