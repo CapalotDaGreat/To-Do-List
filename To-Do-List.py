@@ -1,10 +1,15 @@
+import json
+from datetime import datetime
+
 def display_tasks(tasks):
     if not tasks:
         print("Keine Aufgaben in der Liste.")
     else:
         print("Aktuelle Aufgaben:")
         for index, task in enumerate(tasks, start=1):
-            print(f"{index}. {task}")
+            task_type = "Einmalig" if task['type'] == 'one-time' else "Wiederholend"
+            due_date = task['due_date'].strftime("%d.%m.%Y") if task['due_date'] else "Kein Fälligkeitsdatum"
+            print(f"{index}. {task['description']} - Typ: {task_type}, Fällig am: {due_date}")
 
 def main():
     tasks = []
@@ -25,6 +30,7 @@ def main():
 
         elif choice == "2":
             display_tasks(tasks)
+            input("Drücken Sie eine beliebige Taste, um fortzufahren...")
 
         elif choice == "3":
             display_tasks(tasks)
