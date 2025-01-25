@@ -1,5 +1,18 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+
+
+def load_tasks(filename):
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+
+
+def save_tasks(tasks):
+    with open('tasks.json', 'w') as f:
+        json.dump(tasks, f, default=str)
 
 
 def display_tasks(tasks):
@@ -13,9 +26,20 @@ def display_tasks(tasks):
             print(f"{index}. {task['description']} - Typ: {task_type}, Fällig am: {due_date}")
 
 
-def save_tasks(tasks):
-    with open('tasks.json', 'w') as f:
-        json.dump(tasks, f, default=str)
+def add_task(tasks):
+    description = input("Geben Sie die Aufgabe ein: ")
+    due_date = input(
+        "Geben Sie das Fälligkeitsdatum ein (YYYY-MM-DD) oder 'wiederkehrend' für wiederkehrende Aufgaben: ")
+
+    if due_date.lower() == 'wiederkehrend':
+        interval = int(input("Geben Sie das Intervall in Tagen für die wiederkehrende Aufgabe ein: "))
+        due_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
+        task = {'description': description, 'due_date': due_date, 'recurring': interval}
+    else:
+        task = {'description': description, 'due_date': due_date, 'recurring': None}
+
+    tasks.append(task)
+    print(f"Aufgabe '{description}' hinzugefügt.")
 
 
 def main():
