@@ -10,6 +10,12 @@ def load_tasks(filename):
         return []
 
 
+def delete_tasks(filename):
+    with open(filename, 'w') as f:
+        json.dump([], f, default=str)
+        return []
+
+
 def save_tasks(tasks):
     with open('tasks.json', 'w') as f:
         json.dump(tasks, f, default=str)
@@ -21,8 +27,8 @@ def display_tasks(tasks):
     else:
         print("Aktuelle Aufgaben:")
         for index, task in enumerate(tasks, start=1):
-            task_type = "Einmalig" if task['type'] == 'one-time' else "Wiederholend"
-            due_date = task['due_date'].strftime("%d.%m.%Y") if task['due_date'] else "Kein Fälligkeitsdatum"
+            task_type = "Einmalig" if task.get('recurring') is None else "Wiederholend"
+            due_date = task.get('due_date', "Kein Fälligkeitsdatum")
             print(f"{index}. {task['description']} - Typ: {task_type}, Fällig am: {due_date}")
 
 
@@ -55,9 +61,7 @@ def main():
         choice = input("Bitte eine Option auswählen (1-4): ")
 
         if choice == "1":
-            task = input("Neue Aufgabe eingeben: ")
-            tasks.append(task)
-            print(f"Aufgabe '{task}' hinzugefügt.")
+            add_task(tasks)
 
         elif choice == "2":
             display_tasks(tasks)
@@ -69,7 +73,7 @@ def main():
                 task_index = int(input("Geben Sie die Nummer der Aufgabe ein, die Sie entfernen möchten: ")) - 1
                 if 0 <= task_index < len(tasks):
                     removed_task = tasks.pop(task_index)
-                    print(f"Aufgabe '{removed_task}' entfernt.")
+                    print(f"Aufgabe '{removed_task['description']}' entfernt.")
                 else:
                     print("Ungültige Nummer.")
             except ValueError:
