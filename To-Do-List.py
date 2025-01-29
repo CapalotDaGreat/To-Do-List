@@ -35,7 +35,7 @@ def display_tasks(tasks):
 def add_task(tasks):
     description = input("Geben Sie die Aufgabe ein: ")
     due_date = input(
-        "Geben Sie das Fälligkeitsdatum ein (YYYY-MM-DD) oder 'wiederkehrend' für wiederkehrende Aufgaben: ")
+        "Geben Sie das Fälligkeitsdatum ein (YYYY-MM-DD) oder 'w' für wiederkehrende Aufgaben: ")
 
     if due_date.lower() == 'wiederkehrend':
         interval = int(input("Geben Sie das Intervall in Tagen für die wiederkehrende Aufgabe ein: "))
