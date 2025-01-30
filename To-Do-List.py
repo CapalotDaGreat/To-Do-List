@@ -2,26 +2,30 @@ import json
 from datetime import datetime, timedelta
 
 
-def load_tasks(filename):
+def load_tasks(filename="tasks.json"):
+    """
+    Laden von Aufgaben aus einer JSON-Datei.
+    """
     try:
         with open(filename, 'r') as file:
-            return json.load(file)
+            tasks = json.load(file)
+            return tasks
     except FileNotFoundError:
         return []
 
 
-def delete_tasks(filename):
+def save_tasks(tasks, filename="tasks.json"):
+    """
+    Speichern von Aufgaben in einer JSON-Datei.
+    """
     with open(filename, 'w') as f:
-        json.dump([], f, default=str)
-        return []
-
-
-def save_tasks(tasks):
-    with open('tasks.json', 'w') as f:
         json.dump(tasks, f, default=str)
 
 
 def display_tasks(tasks):
+    """
+    Anzeigen aller Aufgaben.
+    """
     if not tasks:
         print("Keine Aufgaben in der Liste.")
     else:
@@ -33,25 +37,81 @@ def display_tasks(tasks):
 
 
 def add_task(tasks):
+    """
+    Hinzufügen einer neuen Aufgabe (einmalig oder wiederkehrend).
+    """
     description = input("Geben Sie die Aufgabe ein: ")
-    due_date = input(
-        "Geben Sie das Fälligkeitsdatum ein (YYYY-MM-DD) oder 'w' für wiederkehrende Aufgaben: ")
 
-    if due_date.lower() == 'wiederkehrend':
-        interval = int(input("Geben Sie das Intervall in Tagen für die wiederkehrende Aufgabe ein: "))
-        due_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
-        task = {'description': description, 'due_date': due_date, 'recurring': interval}
-    else:
-        task = {'description': description, 'due_date': due_date, 'recurring': None}
+    while True:
+        due_date = input(
+            "Geben Sie das Fälligkeitsdatum ein (YYYY-MM-DD) oder 'w' für wiederkehrende Aufgaben: "
+        )
+
+        if due_date.lower() == 'w':
+            try:
+                interval = int(input("Geben Sie das Intervall in Tagen für die wiederkehrende Aufgabe ein: "))
+                due_date = (datetime.now() + timedelta(days=interval)).strftime('%Y-%m-%d')
+                task = {'description': description, 'due_date': due_date, 'recurring': interval}
+                break
+            except ValueError:
+                print("Bitte geben Sie ein gültiges Intervall ein.")
+        else:
+            try:
+                datetime.strptime(due_date, '%Y-%m-%d')
+                task = {'description': description, 'due_date': due_date, 'recurring': None}
+                break
+            except ValueError:
+                print("Bitte geben Sie ein gültiges Fälligkeitsdatum im Format YYYY-MM-DD ein.")
 
     tasks.append(task)
+    save_tasks(tasks)
     print(f"Aufgabe '{description}' hinzugefügt.")
 
 
+def delete_task(tasks):
+    """
+    Löschen einer Aufgabe anhand ihrer Indexnummer.
+    """
+    display_tasks(tasks)
+    if not tasks:
+        return
+
+    try:
+        task_index = int(input("Geben Sie die Nummer der Aufgabe ein, die Sie entfernen möchten: ")) - 1
+        if 0 <= task_index < len(tasks):
+            removed_task = tasks.pop(task_index)
+            save_tasks(tasks)  # Speichern nach Löschen
+            print(f"Aufgabe '{removed_task['description']}' entfernt.")
+        else:
+            print("Ungültige Nummer.")
+    except ValueError:
+        print("Bitte geben Sie eine gültige Zahl ein.")
+
+
+def update_recurring_tasks(tasks):
+    """
+    Aktualisieren von wiederkehrenden Aufgaben: Verschieben von fälligen Aufgaben basierend auf ihrem Intervall.
+    """
+    today = datetime.now()
+    for task in tasks:
+        if task.get('recurring') is not None:
+            due_date = datetime.strptime(task['due_date'], '%Y-%m-%d')
+            while due_date < today:
+                due_date += timedelta(days=task['recurring'])
+            task['due_date'] = due_date.strftime('%Y-%m-%d')
+
+
 def main():
-    tasks = []
+    """
+    Hauptprogramm für das Aufgabenverwaltungsprogramm.
+    """
+    filename = "tasks.json"
+    tasks = load_tasks(filename)
 
     while True:
+        update_recurring_tasks(tasks)
+        save_tasks(tasks)
+
         print("\nAufgabenverwaltung")
         print("1. Eine Aufgabe hinzufügen")
         print("2. Alle Aufgaben anzeigen")
@@ -68,18 +128,9 @@ def main():
             input("Drücken Sie eine beliebige Taste, um fortzufahren...")
 
         elif choice == "3":
-            display_tasks(tasks)
-            try:
-                task_index = int(input("Geben Sie die Nummer der Aufgabe ein, die Sie entfernen möchten: ")) - 1
-                if 0 <= task_index < len(tasks):
-                    removed_task = tasks.pop(task_index)
-                    print(f"Aufgabe '{removed_task['description']}' entfernt.")
-                else:
-                    print("Ungültige Nummer.")
-            except ValueError:
-                print("Bitte geben Sie eine gültige Zahl ein.")
+            delete_task(tasks)
 
-        elif choice == '4':
+        elif choice == "4":
             print("Programm beendet.")
             break
 
