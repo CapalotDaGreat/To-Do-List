@@ -80,7 +80,7 @@ def delete_task(tasks):
         task_index = int(input("Geben Sie die Nummer der Aufgabe ein, die Sie entfernen möchten: ")) - 1
         if 0 <= task_index < len(tasks):
             removed_task = tasks.pop(task_index)
-            save_tasks(tasks)  # Speichern nach Löschen
+            save_tasks(tasks)
             print(f"Aufgabe '{removed_task['description']}' entfernt.")
         else:
             print("Ungültige Nummer.")
@@ -125,7 +125,7 @@ def main():
 
         elif choice == "2":
             display_tasks(tasks)
-            input("Drücken Sie eine beliebige Taste, um fortzufahren...")
+            input("Drücken Sie 'Enter', um fortzufahren...")
 
         elif choice == "3":
             delete_task(tasks)
